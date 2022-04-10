@@ -13,25 +13,25 @@ namespace bd {
 	}
 
 	void CompoundTag::setUint8(std::string key, uint8 value) {
-		tags[key] = new NumberTag(key, value, (uint16) 1);
+		tags[key] = new NumberTag(key, value, false, (uint16) 1);
 	}
 	void CompoundTag::setUint16(std::string key, uint16 value) {
-		tags[key] = new NumberTag(key, value, (uint16) 2);
+		tags[key] = new NumberTag(key, value, false, (uint16) 2);
 	}
 	void CompoundTag::setUint32(std::string key, uint32 value) {
-		tags[key] = new NumberTag(key, value, (uint16) 4);
+		tags[key] = new NumberTag(key, value, false, (uint16) 4);
 	}
 	void CompoundTag::setUint64(std::string key, uint64 value) {
-		tags[key] = new NumberTag(key, value, (uint16) 8);
+		tags[key] = new NumberTag(key, value, false, (uint16) 8);
 	}
 	void CompoundTag::setFloat(std::string key, float value) {
-		tags[key] = new NumberTag(key, value, (uint16) 4);
+		tags[key] = new NumberTag(key, value, true, (uint16) 4);
 	}
 	void CompoundTag::setDouble(std::string key, double value) {
-		tags[key] = new NumberTag(key, value, (uint16) 8);
+		tags[key] = new NumberTag(key, value, true, (uint16) 8);
 	}
 	void CompoundTag::setBool(std::string key, bool value) {
-		tags[key] = new NumberTag(key, value ? 1 : 0, (uint16) 1);
+		tags[key] = new NumberTag(key, value ? 1 : 0, false, (uint16) 1);
 	}
 	void CompoundTag::setString(std::string key, std::string value) {
 		tags[key] = new StringTag(key, value);
@@ -99,7 +99,9 @@ namespace bd {
 				stream.write(reinterpret_cast<const char*>(&size), sizeof(uint16));
 				
 				if(tag->getID() == BD_TAG_ID_NUMBER) {
-					std::any number = ((NumberTag*) tag)->getValue();
+					NumberTag* tagN =  (NumberTag*) tag;
+					std::any number = tagN->getValue();
+					bool floating = tagN->isFloating();
 
 					switch(size) {
 						case 1: {
@@ -113,13 +115,23 @@ namespace bd {
 							break;
 						}
 						case 4: {
-							uint32 num32 = std::any_cast<uint32>(number);
-							stream.write(reinterpret_cast<const char*>(&num32), sizeof(uint32));
+							if(floating) {
+								float num32 = std::any_cast<float>(number);
+								stream.write(reinterpret_cast<const char*>(&num32), sizeof(float));
+							} else {
+								uint32 num32 = std::any_cast<uint32>(number);
+								stream.write(reinterpret_cast<const char*>(&num32), sizeof(uint32));
+							}
 							break;
 						}
 						case 8: {
-							uint64 num64 = std::any_cast<uint64>(number);
-							stream.write(reinterpret_cast<const char*>(&num64), sizeof(uint64));
+							if(floating) {
+								double num64 = std::any_cast<double>(number);
+								stream.write(reinterpret_cast<const char*>(&num64), sizeof(double));
+							} else {
+								uint64 num64 = std::any_cast<double>(number);
+								stream.write(reinterpret_cast<const char*>(&num64), sizeof(uint64));
+							}
 							break;
 						}
 					}
@@ -152,28 +164,40 @@ namespace bd {
 
 			ss << key << ":";
 			if(tagID == BD_TAG_ID_NUMBER) {
-				std::any num = dynamic_cast<NumberTag*>(tag)->getValue();
+				NumberTag* tagN = dynamic_cast<NumberTag*>(tag);
+				std::any num = tagN->getValue();
+				bool floating = tagN->isFloating();
 				uint16 size = dynamic_cast<TagSizeable*>(tag)->getSize();
 
 				switch(size) {
 					case 1: {
 						uint8 num8 = std::any_cast<uint8>(num);
-						ss << num8;
+						ss << num8 << "b";
 						break;
 					}
 					case 2: {
 						uint16 num16 = std::any_cast<uint16>(num);
-						ss << num16;
+						ss << num16 << "s";
 						break;
 					}
 					case 4: {
-						uint32 num32 = std::any_cast<uint32>(num);
-						ss << num32;
+						if(floating) {
+							float num32 = std::any_cast<float>(num);
+							ss << num32 << "f";
+						} else {
+							uint32 num32 = std::any_cast<uint32>(num);
+							ss << num32;
+						}
 						break;
 					}
 					case 8: {
-						uint64 num64 = std::any_cast<uint64>(num);
-						ss << num64;
+						if(floating) {
+							double num64 = std::any_cast<double>(num);
+							ss << num64;
+						} else {
+							uint64 num64 = std::any_cast<uint64>(num);
+							ss << num64 << "l";
+						}
 						break;
 					}
 				}
