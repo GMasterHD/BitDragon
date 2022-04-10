@@ -1,0 +1,9 @@
+/bin/
+/bin-int/
+/.vs/
+/lib/
+
+*.sln
+*.vcxproj
+*.vcxproj.user
+*.vcxproj.filter
