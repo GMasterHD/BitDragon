@@ -1,6 +1,7 @@
 #pragma once
 #include "Tag.hpp"
 #include <unordered_map>
+#include "ArrayTag.hpp"
 
 namespace bd {
 	class CompoundTag: public Tag {
@@ -21,6 +22,11 @@ namespace bd {
 
 		void setString(std::string key, std::string value);
 		CompoundTag* createCompound(std::string key);
+
+		ArrayTag<uint8>* createUint8Array(std::string key);
+		ArrayTag<uint16>* createUint16Array(std::string key);
+		ArrayTag<uint32>* createUint32Array(std::string key);
+		ArrayTag<uint64>* createUint64Array(std::string key);
 
 		uint8 getUint8(std::string key) const;
 		uint16 getUint16(std::string key) const;

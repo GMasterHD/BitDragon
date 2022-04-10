@@ -12,6 +12,12 @@ int main(int argc, char** argv) {
 	bd::CompoundTag* inner = tag.createCompound("inner");
 	inner->setString("tag", "This is inner Tag!");
 
+	bd::ArrayTag<uint32>* arr = tag.createUint32Array("arr");
+	arr->add(1);
+	arr->add(2);
+	arr->add(3);
+	arr->add(95);
+
 	bd::BitDragon::serialize(tag, "./test.dat");
 	std::cout << tag.stringify() << std::endl;
 }
