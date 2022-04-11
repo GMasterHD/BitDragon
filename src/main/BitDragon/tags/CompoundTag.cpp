@@ -124,7 +124,7 @@ namespace bd {
 				bool floating = tagS->isFloating();
 				stream.write(reinterpret_cast<const char*>(&size), sizeof(uint16));
 				
-				if(tag->getID() == BD_TAG_ID_NUMBER) {
+				if(tag->getID() == BD_TAG_ID_NUMBER || tag->getID() == BD_TAG_ID_NUMBER_FLOAT) {
 					NumberTag* tagN =  (NumberTag*) tag;
 					std::any number = tagN->getValue();
 
@@ -163,7 +163,7 @@ namespace bd {
 				} else if(tag->getID() == BD_TAG_ID_STRING) {
 					std::string value = ((StringTag*) tag)->getValue();
 					stream.write(value.c_str(), value.size());
-				} else if(tag->getID() == BD_TAG_ID_ARRAY) {
+				} else if(tag->getID() == BD_TAG_ID_ARRAY || tag->getID() == BD_TAG_ID_ARRAY_FLOAT) {
 					switch(size) {
 						case 1: {
 							ArrayTag<uint8>* arr = ((ArrayTag<uint8>*) tag);
@@ -221,7 +221,7 @@ namespace bd {
 			std::cout << "Tag " << key << " (" << ((uint32) tagID) << ")" << std::endl;
 
 			ss << key << ":";
-			if(tagID == BD_TAG_ID_NUMBER) {
+			if(tagID == BD_TAG_ID_NUMBER || tagID == BD_TAG_ID_NUMBER_FLOAT) {
 				NumberTag* tagN = dynamic_cast<NumberTag*>(tag);
 				std::any num = tagN->getValue();
 				bool floating = tagN->isFloating();
@@ -263,7 +263,7 @@ namespace bd {
 				ss << "\"" << ((StringTag*) tag)->getValue() << "\"";
 			} else if(tagID == BD_TAG_ID_COMPOUND) {
 				ss << ((CompoundTag*) tag)->stringify();
-			} else if(tagID == BD_TAG_ID_ARRAY) {
+			} else if(tagID == BD_TAG_ID_ARRAY || tagID == BD_TAG_ID_ARRAY_FLOAT) {
 				TagSizeable* tagS = dynamic_cast<TagSizeable*>(tag);
 				uint16 size = tagS->getSize();
 				bool floating = tagS->isFloating();
@@ -304,6 +304,130 @@ namespace bd {
 		return ss.str();
 	}
 
-	void CompoundTag::deSerialize(std::istream& stream) {
+	void CompoundTag::deserialize(std::istream& stream) {
+		while(true) {
+			uint8 id;
+			stream.read((char*) &id, sizeof(uint8));
+			std::cout << "ID: " << ((uint32) id) << std::endl;
+
+			if(id == BD_TAG_ID_COMPOUND) {
+				std::string key = readKeyName(stream);
+				CompoundTag* inner = createCompound(key);
+				inner->deserialize(stream);
+			} else if(id == BD_TAG_ID_CTAG_END) {
+				return;
+			} else if(id == BD_TAG_ID_NUMBER || id == BD_TAG_ID_NUMBER_FLOAT) {
+				bool floating = id == BD_TAG_ID_NUMBER_FLOAT;
+				std::string key = readKeyName(stream);
+				uint16 size;
+				stream.read((char*) &size, sizeof(uint16));
+				std::cout << "Reading key '" << key << "' (Size: " << size << " Floating: " << floating << ")" << std::endl;
+
+				switch(size) {
+					case 1: {
+						uint8 num;
+						stream.read((char*) &num, sizeof(uint8));
+						setUint8(key, num);
+						break;
+					}
+					case 2: {
+						uint16 num;
+						stream.read((char*) &num, sizeof(uint16));
+						setUint16(key, num);
+						break;
+					}
+					case 4: {
+						if(floating) {
+							float num;
+							stream.read((char*) &num, sizeof(float));
+							setFloat(key, num);
+						} else {
+							uint32 num;
+							stream.read((char*) &num, sizeof(uint32));
+							setUint32(key, num);
+						}
+						break;
+					}
+					case 8: {
+						if(floating) {
+							double num;
+							stream.read((char*) &num, sizeof(double));
+							setDouble(key, num);
+						} else {
+							uint64 num;
+							stream.read((char*) &num, sizeof(uint64));
+							setUint64(key, num);
+						}
+						break;
+					}
+				}
+				std::cout << stringify() << std::endl;
+			} else if(id == BD_TAG_ID_ARRAY || id == BD_TAG_ID_ARRAY_FLOAT) {
+				bool floating = id == BD_TAG_ID_ARRAY_FLOAT;
+				std::string key = readKeyName(stream);
+				uint16 size;
+				stream.read((char*) &size, sizeof(uint16));
+
+				uint16 length;
+				stream.read((char*) &length, sizeof(uint16));
+
+				std::cout << "Reading array '" << key << "' (Size: " << size << ", Length: " << length << ", Floatings: " << floating << ")" << std::endl;
+				
+				switch(size) {
+					case 1: {
+						readArray<uint8>(stream, size, floating, key, length); 
+						break;
+					}
+					case 2: {
+						readArray<uint16>(stream, size, floating, key, length);
+						break;
+					}
+					case 4: {
+						if(floating) {
+							readArray<float>(stream, size, floating, key, length);
+						} else {
+							readArray<uint32>(stream, size, floating, key, length);
+						}
+						break;
+					}
+					case 8: {
+						if(floating) {
+							readArray<double>(stream, size, floating, key, length);
+						} else {
+							readArray<uint64>(stream, size, floating, key, length);
+						}
+						break;
+					}
+				}
+				std::cout << stringify() << std::endl;
+			} else if(id == BD_TAG_ID_STRING) {
+				std::string key = readKeyName(stream);
+				uint16 size;
+				stream.read((char*) &size, sizeof(uint16));
+
+				std::stringstream ss_val;
+				char c;
+				for(uint16 i = 0; i < size; ++i) {
+					stream.read(&c, sizeof(char));
+					if(c == ';') break;
+					ss_val << c;
+				}
+
+				setString(key, ss_val.str());
+				std::cout << stringify() << std::endl;
+			}
+		}
+	}
+
+	std::string CompoundTag::readKeyName(std::istream& stream) {
+		std::stringstream ss_key;
+		char c;
+		while(true) {
+			stream.read(&c, sizeof(char));
+			if(c == ';') break;
+			ss_key << c;
+		}
+		std::string key = ss_key.str();
+		return key;
 	}
 }

@@ -9,7 +9,7 @@ namespace bd {
 	template<typename T>
 	class ArrayTag: public Tag, public TagSizeable {
 	public:
-		ArrayTag(std::string key, uint16 size, bool floating): Tag(key, BD_TAG_ID_ARRAY), TagSizeable(size, floating) {
+		ArrayTag(std::string key, uint16 size, bool floating): Tag(key, floating ? BD_TAG_ID_ARRAY_FLOAT : BD_TAG_ID_ARRAY), TagSizeable(size, floating) {
 		}
 
 		void add(T val) {
@@ -76,7 +76,9 @@ namespace bd {
 			ss << "]";
 		}
 
-		void deSerialize(std::istream& stream) override { }
+		void deserialize(std::istream& stream) override {
+			
+		}
 
 	private:
 		std::vector<T> values;

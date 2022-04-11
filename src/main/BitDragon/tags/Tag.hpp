@@ -10,11 +10,11 @@ namespace bd {
 		Tag(std::string key, uint8 id): key(key), id(id) { }
 		Tag(): key("") { }
 
-		virtual void serialize(std::ostream& stream) const = 0;
-		virtual void deSerialize(std::istream& stream) = 0;
-
 		std::string getKey() const { return key; }
 		uint8 getID() const { return id; }
+
+		virtual void serialize(std::ostream& stream) const { }
+		virtual void deserialize(std::istream& stream) { }
 
 	protected:
 		std::string key;

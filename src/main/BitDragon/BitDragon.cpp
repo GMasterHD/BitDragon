@@ -3,10 +3,18 @@
 #include <iostream>
 
 namespace bd {
-	void BitDragon::serialize(const CompoundTag& ctag, std::string path) {
+	void BitDragon::serialize(const CompoundTag& tag, std::string path) {
 		std::ofstream stream(path, std::ios::binary | std::ios::out);
-		ctag.serialize(stream);
+		tag.serialize(stream);
 	}
-	void BitDragon::deSerialize(CompoundTag& tag) {
+	void BitDragon::deserialize(CompoundTag& tag, std::string path) {
+		std::ifstream stream(path, std::ios::binary | std::ios::in);
+
+		uint8 type;
+		stream.read((char*) &type, sizeof(uint8));
+
+		tag.deserialize(stream);
+
+		std::cout << "Final: " << tag.stringify() << std::endl;
 	}
 }

@@ -23,4 +23,7 @@ int main(int argc, char** argv) {
 
 	bd::BitDragon::serialize(tag, "./test.dat");
 	std::cout << tag.stringify() << std::endl;
+
+	bd::CompoundTag deserialized;
+	bd::BitDragon::deserialize(deserialized, "./test.dat");
 }

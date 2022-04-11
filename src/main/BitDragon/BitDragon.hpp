@@ -7,7 +7,7 @@ namespace bd {
 	class BitDragon {
 	public:
 		static void serialize(const CompoundTag& tag, std::string path);
-		static void deSerialize(CompoundTag& tag);
+		static void deserialize(CompoundTag& tag, std::string path);
 
 	private:
 	};

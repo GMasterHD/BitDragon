@@ -54,11 +54,74 @@ namespace bd {
 		}
 
 		void serialize(std::ostream& stream) const override;
-		void deSerialize(std::istream& stream) override;
+		void deserialize(std::istream& stream) override;
 
 		std::string stringify() const;
 
 	private:
+		std::string readKeyName(std::istream& stream);
 		std::unordered_map<std::string, Tag*> tags;
+		
+		template<typename T>
+		void readArray(std::istream& stream, uint16 size, bool floating, std::string key, uint16 length) {
+			switch(size) {
+				case 1: {
+					ArrayTag<uint8>* arr = createUint8Array(key);
+					for(uint16 i = 0; i < length; ++i) {
+						T num;
+						stream.read((char*) &num, sizeof(T));
+						arr->add(num);
+					}
+
+					break;
+				}
+				case 2: {
+					ArrayTag<uint16>* arr = createUint16Array(key);
+					for(uint16 i = 0; i < length; ++i) {
+						T num;
+						stream.read((char*) &num, sizeof(T));
+						arr->add(num);
+					}
+
+					break;
+				}
+				case 4: {
+					if(floating) {
+						ArrayTag<float>* arr = createFloatArray(key);
+						for(uint16 i = 0; i < length; ++i) {
+							T num;
+							stream.read((char*) &num, sizeof(T));
+							arr->add(num);
+						}
+					} else {
+						ArrayTag<uint32>* arr = createUint32Array(key);
+						for(uint16 i = 0; i < length; ++i) {
+							T num;
+							stream.read((char*) &num, sizeof(T));
+							arr->add(num);
+						}
+					}
+					break;
+				}
+				case 8: {
+					if(floating) {
+						ArrayTag<double>* arr = createDoubleArray(key);
+						for(uint16 i = 0; i < length; ++i) {
+							T num;
+							stream.read((char*) &num, sizeof(T));
+							arr->add(num);
+						}
+					} else {
+						ArrayTag<uint64>* arr = createUint64Array(key);
+						for(uint16 i = 0; i < length; ++i) {
+							T num;
+							stream.read((char*) &num, sizeof(T));
+							arr->add(num);
+						}
+					}
+					break;
+				}
+			}
+		}
 	};
 }
