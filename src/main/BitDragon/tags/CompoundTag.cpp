@@ -42,20 +42,28 @@ namespace bd {
 	}
 
 	ArrayTag<uint8>* CompoundTag::createUint8Array(std::string key) {
-		tags.insert(std::pair<std::string, Tag*>(key, (Tag*) new ArrayTag<uint8>(key, 1)));
+		tags.insert(std::pair<std::string, Tag*>(key, (Tag*) new ArrayTag<uint8>(key, 1, false)));
 		return (ArrayTag<uint8>*) tags.at(key);
 	}
 	ArrayTag<uint16>* CompoundTag::createUint16Array(std::string key) {
-		tags.insert(std::pair<std::string, Tag*>(key, (Tag*) new ArrayTag<uint16>(key, 2)));
+		tags.insert(std::pair<std::string, Tag*>(key, (Tag*) new ArrayTag<uint16>(key, 2, false)));
 		return (ArrayTag<uint16>*) tags.at(key);
 	}
 	ArrayTag<uint32>* CompoundTag::createUint32Array(std::string key) {
-		tags.insert(std::pair<std::string, Tag*>(key, (Tag*) new ArrayTag<uint32>(key, 4)));
+		tags.insert(std::pair<std::string, Tag*>(key, (Tag*) new ArrayTag<uint32>(key, 4, false)));
 		return (ArrayTag<uint32>*) tags.at(key);
 	}
 	ArrayTag<uint64>* CompoundTag::createUint64Array(std::string key) {
-		tags.insert(std::pair<std::string, Tag*>(key, (Tag*) new ArrayTag<uint64>(key, 8)));
+		tags.insert(std::pair<std::string, Tag*>(key, (Tag*) new ArrayTag<uint64>(key, 8, false)));
 		return (ArrayTag<uint64>*) tags.at(key);
+	}
+	ArrayTag<float>* CompoundTag::createFloatArray(std::string key) {
+		tags.insert(std::pair<std::string, Tag*>(key, (Tag*) new ArrayTag<float>(key, 4, true)));
+		return (ArrayTag<float>*) tags.at(key);
+	}
+	ArrayTag<double>* CompoundTag::createDoubleArray(std::string key) {
+		tags.insert(std::pair<std::string, Tag*>(key, (Tag*) new ArrayTag<double>(key, 8, true)));
+		return (ArrayTag<double>*) tags.at(key);
 	}
 
 	uint8 CompoundTag::getUint8(std::string key) const {
@@ -113,12 +121,12 @@ namespace bd {
 			stream.write(key.c_str(), key.size());
 			if(TagSizeable* tagS = dynamic_cast<TagSizeable*>(tag)) {
 				uint16 size = tagS->getSize();
+				bool floating = tagS->isFloating();
 				stream.write(reinterpret_cast<const char*>(&size), sizeof(uint16));
 				
 				if(tag->getID() == BD_TAG_ID_NUMBER) {
 					NumberTag* tagN =  (NumberTag*) tag;
 					std::any number = tagN->getValue();
-					bool floating = tagN->isFloating();
 
 					switch(size) {
 						case 1: {
@@ -168,13 +176,23 @@ namespace bd {
 							break;
 						}
 						case 4: {
-							ArrayTag<uint32>* arr = ((ArrayTag<uint32>*) tag);
-							arr->serialize(stream);
+							if(floating) {
+								ArrayTag<float>* arr = ((ArrayTag<float>*) tag);
+								arr->serialize(stream);
+							} else {
+								ArrayTag<uint32>* arr = ((ArrayTag<uint32>*) tag);
+								arr->serialize(stream);
+							}
 							break;
 						}
 						case 8: {
-							ArrayTag<uint64>* arr = ((ArrayTag<uint64>*) tag);
-							arr->serialize(stream);
+							if(floating) {
+								ArrayTag<double>* arr = ((ArrayTag<double>*) tag);
+								arr->serialize(stream);
+							} else {
+								ArrayTag<uint64>* arr = ((ArrayTag<uint64>*) tag);
+								arr->serialize(stream);
+							}
 							break;
 						}
 					}
@@ -246,7 +264,10 @@ namespace bd {
 			} else if(tagID == BD_TAG_ID_COMPOUND) {
 				ss << ((CompoundTag*) tag)->stringify();
 			} else if(tagID == BD_TAG_ID_ARRAY) {
-				uint16 size = dynamic_cast<TagSizeable*>(tag)->getSize();
+				TagSizeable* tagS = dynamic_cast<TagSizeable*>(tag);
+				uint16 size = tagS->getSize();
+				bool floating = tagS->isFloating();
+
 				switch(size) {
 					case 1: {
 						((ArrayTag<uint8>*) tag)->stringify(ss);
@@ -257,11 +278,19 @@ namespace bd {
 						break;
 					}
 					case 4: {
-						((ArrayTag<uint32>*) tag)->stringify(ss);
+						if(floating) {
+							((ArrayTag<float>*) tag)->stringify(ss);
+						} else {
+							((ArrayTag<uint32>*) tag)->stringify(ss);
+						}
 						break;
 					}
 					case 8: {
-						((ArrayTag<uint64>*) tag)->stringify(ss);
+						if(floating) {
+							((ArrayTag<double>*) tag)->stringify(ss);
+						} else {
+							((ArrayTag<uint64>*) tag)->stringify(ss);
+						}
 						break;
 					}
 				}

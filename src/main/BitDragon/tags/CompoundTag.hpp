@@ -27,6 +27,8 @@ namespace bd {
 		ArrayTag<uint16>* createUint16Array(std::string key);
 		ArrayTag<uint32>* createUint32Array(std::string key);
 		ArrayTag<uint64>* createUint64Array(std::string key);
+		ArrayTag<float>* createFloatArray(std::string key);
+		ArrayTag<double>* createDoubleArray(std::string key);
 
 		uint8 getUint8(std::string key) const;
 		uint16 getUint16(std::string key) const;

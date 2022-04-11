@@ -11,6 +11,9 @@ int main(int argc, char** argv) {
 
 	bd::CompoundTag* inner = tag.createCompound("inner");
 	inner->setString("tag", "This is inner Tag!");
+	
+	bd::ArrayTag<float>* values = inner->createFloatArray("values");
+	values->add(95.732f);
 
 	bd::ArrayTag<uint32>* arr = tag.createUint32Array("arr");
 	arr->add(1);

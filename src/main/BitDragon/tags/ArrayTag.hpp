@@ -9,7 +9,7 @@ namespace bd {
 	template<typename T>
 	class ArrayTag: public Tag, public TagSizeable {
 	public:
-		ArrayTag(std::string key, uint16 size): Tag(key, BD_TAG_ID_ARRAY), TagSizeable(size) {
+		ArrayTag(std::string key, uint16 size, bool floating): Tag(key, BD_TAG_ID_ARRAY), TagSizeable(size, floating) {
 		}
 
 		void add(T val) {
@@ -18,6 +18,7 @@ namespace bd {
 		T& get(uint16 index) {
 			return values.at(index);
 		}
+
 		uint16 length() {
 			return values.size();
 		}
@@ -30,11 +31,12 @@ namespace bd {
 			uint16 length = values.size();
 			stream.write(reinterpret_cast<const char*>(&length), sizeof(uint16));
 
-			for(T v : values) {
-				stream.write(reinterpret_cast<const char*>(&v), sizeof(T));
+			for(uint16 i = 0; i < values.size(); ++i) {
+				stream.write(reinterpret_cast<const char*>(&values[i]), sizeof(T));
 			}
 		}
 		void stringify(std::stringstream& ss) const {
+			bool floating = this->TagSizeable::isFloating();
 			ss << "[";
 
 			switch(this->TagSizeable::getSize()) {
@@ -47,19 +49,28 @@ namespace bd {
 					break;
 				}
 				case 4: {
-					ss << BD_TAG_DATA_TYPE_INT32 << ";";
+					if(floating) {
+						ss << BD_TAG_DATA_TYPE_FLOAT << ";";
+					} else {
+						ss << BD_TAG_DATA_TYPE_INT32 << ";";
+					}
 					break;
 				}
 				case 8: {
-					ss << BD_TAG_DATA_TYPE_INT64 << ";";
+					if(floating) {
+						ss << BD_TAG_DATA_TYPE_DOUBLE << ";";
+					} else {
+						ss << BD_TAG_DATA_TYPE_INT64 << ";";
+					}
 					break;
 				}
 			}
 
 			bool first = true;
-			for(T v : values) {
+			for(uint16 i = 0; i < values.size(); ++i) {
 				if(!first) ss << ",";
-				ss << v;
+
+				ss << values.at(i);
 				first = false;
 			}
 			ss << "]";
