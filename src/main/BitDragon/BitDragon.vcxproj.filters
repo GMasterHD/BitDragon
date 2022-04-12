@@ -8,6 +8,9 @@
   <ItemGroup>
     <ClInclude Include="BitDragon.hpp" />
     <ClInclude Include="Defines.hpp" />
+    <ClInclude Include="tags\ArrayTag.hpp">
+      <Filter>tags</Filter>
+    </ClInclude>
     <ClInclude Include="tags\CompoundTag.hpp">
       <Filter>tags</Filter>
     </ClInclude>
@@ -23,10 +26,12 @@
     <ClInclude Include="tags\TagSizeable.hpp">
       <Filter>tags</Filter>
     </ClInclude>
-    <ClInclude Include="tags\ArrayTag.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="BitDragon.cpp" />
+    <ClCompile Include="tags\ArrayTag.cpp">
+      <Filter>tags</Filter>
+    </ClCompile>
     <ClCompile Include="tags\CompoundTag.cpp">
       <Filter>tags</Filter>
     </ClCompile>
@@ -36,6 +41,5 @@
     <ClCompile Include="tags\StringTag.cpp">
       <Filter>tags</Filter>
     </ClCompile>
-    <ClCompile Include="tags\ArrayTag.cpp" />
   </ItemGroup>
 </Project>

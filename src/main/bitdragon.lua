@@ -29,7 +29,6 @@ project "BitDragon"
 	}
 
 	links {
-		"YAML"
 	}
 
 	filter "configurations:*86 or configurations:*32"

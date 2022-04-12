@@ -1,6 +1,5 @@
 #pragma once
 #include "tags/Tag.hpp"
-#include "tags/NumberTag.hpp"
 #include "tags/CompoundTag.hpp"
 
 namespace bd {

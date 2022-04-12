@@ -19,7 +19,6 @@ workspace "BitDragon"
 	filter { }
 
 	group "Libraries"
-		include "lib/yaml-cpp"
 	group "Tests"
 	group ""
 		include "src/main/bitdragon.lua"
