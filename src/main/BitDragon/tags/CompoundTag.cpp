@@ -115,8 +115,6 @@ namespace bd {
 			Tag* tag = it->second;
 			uint8 tagID = tag->getID();
 
-			std::cout << "Tag " << key << " (" << ((uint32) tagID) << ")" << std::endl;
-
 			stream.write(reinterpret_cast<const char*>(&tagID), sizeof(uint8));
 			stream.write(key.c_str(), key.size());
 			if(TagSizeable* tagS = dynamic_cast<TagSizeable*>(tag)) {
@@ -206,21 +204,34 @@ namespace bd {
 		stream.write(reinterpret_cast<const char*>(&endID), sizeof(uint8));
 	}
 
-	std::string CompoundTag::stringify() const {
-		std::stringstream ss;
+	void CompoundTag::stringify(std::ostream& ss, bool tabs, std::string currentIndention) const {
+		currentIndention += "\t";
+
 		ss << "{";
+		if(tabs) {
+			ss << "\n" << currentIndention;
+		}
 
 		bool first = true;
 		for(auto it = tags.begin(); it != tags.end(); ++it) {
-			if(!first) ss << ",";
+			if(!first) {
+				ss << ",";
+				if(tabs) {
+					ss << "\n" << currentIndention;
+				}
+			}
 
 			std::string key = it->first;
 			Tag* tag = it->second;
 			uint8 tagID = tag->getID();
 
-			std::cout << "Tag " << key << " (" << ((uint32) tagID) << ")" << std::endl;
 
-			ss << key << ":";
+			ss << key;
+			if(tabs) {
+				ss << ": ";
+			} else {
+				ss << ":";
+			}
 			if(tagID == BD_TAG_ID_NUMBER || tagID == BD_TAG_ID_NUMBER_FLOAT) {
 				NumberTag* tagN = dynamic_cast<NumberTag*>(tag);
 				std::any num = tagN->getValue();
@@ -262,7 +273,7 @@ namespace bd {
 			} else if(tagID == BD_TAG_ID_STRING) {
 				ss << "\"" << ((StringTag*) tag)->getValue() << "\"";
 			} else if(tagID == BD_TAG_ID_COMPOUND) {
-				ss << ((CompoundTag*) tag)->stringify();
+				((CompoundTag*) tag)->stringify(ss, tabs, currentIndention);
 			} else if(tagID == BD_TAG_ID_ARRAY || tagID == BD_TAG_ID_ARRAY_FLOAT) {
 				TagSizeable* tagS = dynamic_cast<TagSizeable*>(tag);
 				uint16 size = tagS->getSize();
@@ -270,26 +281,26 @@ namespace bd {
 
 				switch(size) {
 					case 1: {
-						((ArrayTag<uint8>*) tag)->stringify(ss);
+						((ArrayTag<uint8>*) tag)->stringify(ss, tabs, currentIndention);
 						break;
 					}
 					case 2: {
-						((ArrayTag<uint16>*) tag)->stringify(ss);
+						((ArrayTag<uint16>*) tag)->stringify(ss, tabs, currentIndention);
 						break;
 					}
 					case 4: {
 						if(floating) {
-							((ArrayTag<float>*) tag)->stringify(ss);
+							((ArrayTag<float>*) tag)->stringify(ss, tabs, currentIndention);
 						} else {
-							((ArrayTag<uint32>*) tag)->stringify(ss);
+							((ArrayTag<uint32>*) tag)->stringify(ss, tabs, currentIndention);
 						}
 						break;
 					}
 					case 8: {
 						if(floating) {
-							((ArrayTag<double>*) tag)->stringify(ss);
+							((ArrayTag<double>*) tag)->stringify(ss, tabs, currentIndention);
 						} else {
-							((ArrayTag<uint64>*) tag)->stringify(ss);
+							((ArrayTag<uint64>*) tag)->stringify(ss, tabs, currentIndention);
 						}
 						break;
 					}
@@ -298,20 +309,23 @@ namespace bd {
 
 			first = false;
 		}
+		currentIndention = currentIndention.substr(0, currentIndention.size() - 1);
+
+		if(tabs) {
+			ss << "\n" << currentIndention;
+		}
 
 		ss << "}";
-
-		return ss.str();
 	}
 
 	void CompoundTag::deserialize(std::istream& stream) {
 		while(true) {
 			uint8 id;
 			stream.read((char*) &id, sizeof(uint8));
-			std::cout << "ID: " << ((uint32) id) << std::endl;
 
 			if(id == BD_TAG_ID_COMPOUND) {
 				std::string key = readKeyName(stream);
+				std::cout << "Starting new compound with key '" << key << "'" << std::endl;
 				CompoundTag* inner = createCompound(key);
 				inner->deserialize(stream);
 			} else if(id == BD_TAG_ID_CTAG_END) {
@@ -361,7 +375,6 @@ namespace bd {
 						break;
 					}
 				}
-				std::cout << stringify() << std::endl;
 			} else if(id == BD_TAG_ID_ARRAY || id == BD_TAG_ID_ARRAY_FLOAT) {
 				bool floating = id == BD_TAG_ID_ARRAY_FLOAT;
 				std::string key = readKeyName(stream);
@@ -399,7 +412,6 @@ namespace bd {
 						break;
 					}
 				}
-				std::cout << stringify() << std::endl;
 			} else if(id == BD_TAG_ID_STRING) {
 				std::string key = readKeyName(stream);
 				uint16 size;
@@ -414,7 +426,6 @@ namespace bd {
 				}
 
 				setString(key, ss_val.str());
-				std::cout << stringify() << std::endl;
 			}
 		}
 	}

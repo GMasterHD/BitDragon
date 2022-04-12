@@ -1,4 +1,5 @@
 #include <iostream>
+#include <fstream>
 #include "BitDragon/Defines.hpp"
 #include "BitDragon/BitDragon.hpp"
 
@@ -22,8 +23,10 @@ int main(int argc, char** argv) {
 	arr->add(95);
 
 	bd::BitDragon::serialize(tag, "./test.dat");
-	std::cout << tag.stringify() << std::endl;
 
 	bd::CompoundTag deserialized;
 	bd::BitDragon::deserialize(deserialized, "./test.dat");
+
+	std::ofstream fstream("./test.bit", std::ios::out);
+	deserialized.stringify(fstream);
 }

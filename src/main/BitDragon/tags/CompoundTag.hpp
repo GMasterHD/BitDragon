@@ -56,7 +56,17 @@ namespace bd {
 		void serialize(std::ostream& stream) const override;
 		void deserialize(std::istream& stream) override;
 
-		std::string stringify() const;
+		/// <summary>
+		/// Outputs the human readable version of this tag to a out stream
+		/// </summary>
+		/// <param name="stream">The out stream</param>
+		/// <param name="tabs">If tabs should be used instead of spaces</param>
+		/// <param name="spaceSize">If no tabs are used, the number of spaces to indent</param>
+		void stringify(std::ostream& stream, bool tabs = false) const {
+			stringify(stream, tabs, "");
+		}
+
+		void stringify(std::ostream& stream, bool tabs, std::string currentIndention) const;
 
 	private:
 		std::string readKeyName(std::istream& stream);

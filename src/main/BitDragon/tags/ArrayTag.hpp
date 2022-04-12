@@ -35,9 +35,14 @@ namespace bd {
 				stream.write(reinterpret_cast<const char*>(&values[i]), sizeof(T));
 			}
 		}
-		void stringify(std::stringstream& ss) const {
+		void stringify(std::ostream& ss, bool tabs, std::string currentIndention) const {
 			bool floating = this->TagSizeable::isFloating();
+			currentIndention += "\t";
+
 			ss << "[";
+			if(tabs) {
+				ss << "\n" << currentIndention;
+			}
 
 			switch(this->TagSizeable::getSize()) {
 				case 1: {
@@ -66,13 +71,28 @@ namespace bd {
 				}
 			}
 
+			if(tabs) {
+				ss << " ";
+			}
+
 			bool first = true;
 			for(uint16 i = 0; i < values.size(); ++i) {
-				if(!first) ss << ",";
+				if(!first) {
+					ss << ",";
+					if(tabs) {
+						ss << " ";
+					}
+				}
 
 				ss << values.at(i);
 				first = false;
 			}
+			currentIndention = currentIndention.substr(0, currentIndention.size() - 1);
+
+			if(tabs) {
+				ss << "\n" << currentIndention;
+			}
+
 			ss << "]";
 		}
 

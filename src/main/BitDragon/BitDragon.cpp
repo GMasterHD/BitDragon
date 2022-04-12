@@ -14,7 +14,5 @@ namespace bd {
 		stream.read((char*) &type, sizeof(uint8));
 
 		tag.deserialize(stream);
-
-		std::cout << "Final: " << tag.stringify() << std::endl;
 	}
 }
