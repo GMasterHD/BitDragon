@@ -9,8 +9,18 @@
 namespace bd {
 	class BitDragon {
 	public:
-		static void serialize(const CompoundTag& tag, std::string path);
-		static void deserialize(CompoundTag& tag, std::string path);
+		/// <summary>
+		/// Serializes a compound to a stream
+		/// </summary>
+		/// <param name="tag">The compound</param>
+		/// <param name="stream">The ostream</param>
+		static void serialize(const CompoundTag& tag, std::ostream& stream);
+		/// <summary>
+		/// Deserializes a compound from a stream
+		/// </summary>
+		/// <param name="tag">The compound to save to</param>
+		/// <param name="stream">The istream</param>
+		static void deserialize(CompoundTag& tag, std::istream& stream);
 
 	private:
 	};

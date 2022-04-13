@@ -13,13 +13,26 @@ namespace bd {
 		ArrayTag(std::string key, uint16 size, bool floating): Tag(key, floating ? BD_TAG_ID_ARRAY_FLOAT : BD_TAG_ID_ARRAY), TagSizeable(size, floating) {
 		}
 
+		/// <summary>
+		/// Adds an array element to this array
+		/// </summary>
+		/// <param name="val">The value of the element</param>
 		void add(T val) {
 			values.push_back(val);
 		}
+		/// <summary>
+		/// Gets a element at a index
+		/// </summary>
+		/// <param name="index">The index</param>
+		/// <returns>The element at the index</returns>
 		const T& get(uint16 index) {
 			return values.at(index);
 		}
 
+		/// <summary>
+		/// Gets the count of elements in this array
+		/// </summary>
+		/// <returns>The count</returns>
 		uint16 length() {
 			return values.size();
 		}
@@ -28,17 +41,29 @@ namespace bd {
 			return values.at(index);
 		}
 
+		/// <summary>
+		/// Parses the values
+		/// </summary>
+		/// <param name="f">Function to receive the values (void(value: T))</param>
 		void foreach(std::function<void(T)> f) const {
 			for(uint16 i = 0; i < values.size(); ++i) {
 				f(values.at(i));
 			}
 		}
+		/// <summary>
+		/// Parses the values
+		/// </summary>
+		/// <param name="f">Function to receive the values (void(value: T, index: uint16)</param>
 		void foreach(std::function<void(T, uint16)> f) const {
 			for(uint16 i = 0; i < values.size(); ++i) {
 				f(values.at(i), i);
 			}
 		}
 
+		/// <summary>
+		/// Writes the array to an ostream
+		/// </summary>
+		/// <param name="stream">The stream</param>
 		void serialize(std::ostream& stream) const override {
 			uint16 length = values.size();
 			stream.write(reinterpret_cast<const char*>(&length), sizeof(uint16));
@@ -47,6 +72,12 @@ namespace bd {
 				stream.write(reinterpret_cast<const char*>(&values[i]), sizeof(T));
 			}
 		}
+		/// <summary>
+		/// Converts this array into a string
+		/// </summary>
+		/// <param name="ss">The stream</param>
+		/// <param name="tabs">If tabs should be used</param>
+		/// <param name="currentIndention">The current indention (needed by other functions)</param>
 		void stringify(std::ostream& ss, bool tabs, std::string currentIndention) const {
 			bool floating = this->TagSizeable::isFloating();
 			currentIndention += "\t";

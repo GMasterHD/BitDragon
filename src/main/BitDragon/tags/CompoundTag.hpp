@@ -71,9 +71,21 @@ namespace bd {
 			return get(key);
 		}
 
+		/// <summary>
+		/// Parses the keys of this compound
+		/// </summary>
+		/// <param name="f">The function (void(key: std::string))</param>
 		void keys(std::function<void(std::string)> f);
+		/// <summary>
+		/// Recursively parses the keys and the keys of the keys and so on
+		/// </summary>
+		/// <param name="f">The function (void(key: std::string)</param>
 		void keysDeep(std::function<void(std::string)> f);
 
+		/// <summary>
+		/// Returns the keys as a vector
+		/// </summary>
+		/// <returns></returns>
 		std::vector<std::string> keys() const {
 			std::vector<std::string> out;
 			for(auto it = tags.begin(); it != tags.end(); ++it) {
@@ -82,7 +94,15 @@ namespace bd {
 			return out;
 		}
 
+		/// <summary>
+		/// Saves this compound to a binary ostream
+		/// </summary>
+		/// <param name="stream">The stream</param>
 		void serialize(std::ostream& stream) const override;
+		/// <summary>
+		/// Loads a compound from a binary istream
+		/// </summary>
+		/// <param name="stream">The stream</param>
 		void deserialize(std::istream& stream) override;
 
 		/// <summary>
@@ -95,8 +115,6 @@ namespace bd {
 			stringify(stream, tabs, "");
 		}
 
-		void stringify(std::ostream& stream, bool tabs, std::string currentIndention) const;
-
 	private:
 		std::string readKeyName(std::istream& stream);
 		
@@ -105,6 +123,7 @@ namespace bd {
 
 		void keysDeep(std::string key, std::function<void(std::string)> f);
 		static void keyFromStack(std::stack<std::string>& stack, std::stringstream& ss);
+		void stringify(std::ostream& stream, bool tabs, std::string currentIndention) const;
 
 		template<typename T>
 		void readArray(std::istream& stream, uint16 size, bool floating, std::string key, uint16 length) {

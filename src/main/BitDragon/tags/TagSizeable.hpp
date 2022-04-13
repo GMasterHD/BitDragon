@@ -9,6 +9,10 @@ namespace bd {
 	public:
 		TagSizeable(uint16 size, bool floating): size(size), floating(floating) { }
 
+		/// <summary>
+		/// Gets the size of this tag
+		/// </summary>
+		/// <returns>The size in bytes</returns>
 		uint16 getSize() const { return size; }
 		bool isFloating() const { return floating; }
 
