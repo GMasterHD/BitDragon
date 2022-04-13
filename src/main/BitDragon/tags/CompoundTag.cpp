@@ -292,10 +292,6 @@ namespace bd {
 	}
 
 	void CompoundTag::serialize(std::ostream& stream) const {
-		#ifdef _DEBUG
-		std::cout << "Writing new compound Tag!" << std::endl;
-		#endif
-
 		uint8 startID = BD_TAG_ID_CTAG_START;
 		uint8 endID = BD_TAG_ID_CTAG_END;
 		uint8 null = 0;
@@ -518,7 +514,7 @@ namespace bd {
 			if(id == BD_TAG_ID_COMPOUND) {
 				std::string key = readKeyName(stream);
 				#ifdef _DEBUG
-				std::cout << "Starting new compound with key '" << key << "'" << std::endl;
+				std::cout << "[BitDragon] Starting new compound with key '" << key << "'" << std::endl;
 				#endif
 				CompoundTag* inner = createCompound(key);
 				inner->deserialize(stream);
@@ -530,7 +526,7 @@ namespace bd {
 				uint16 size;
 				stream.read((char*) &size, sizeof(uint16));
 				#ifdef _DEBUG
-				std::cout << "Reading key '" << key << "' (Size: " << size << " Floating: " << floating << ")" << std::endl;
+				std::cout << "[BitDragon] Reading key '" << key << "' (Size: " << size << " Floating: " << floating << ")" << std::endl;
 				#endif
 				
 				switch(size) {
@@ -581,7 +577,7 @@ namespace bd {
 				stream.read((char*) &length, sizeof(uint16));
 
 				#ifdef _DEBUG
-				std::cout << "Reading array '" << key << "' (Size: " << size << ", Length: " << length << ", Floatings: " << floating << ")" << std::endl;
+				std::cout << "[BitDragon] Reading array '" << key << "' (Size: " << size << ", Length: " << length << ", Floatings: " << floating << ")" << std::endl;
 				#endif
 
 				switch(size) {
