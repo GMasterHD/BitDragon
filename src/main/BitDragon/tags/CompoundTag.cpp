@@ -101,6 +101,105 @@ namespace bd {
 		return *(((CompoundTag*) tags.at(key)));
 	}
 
+	ArrayTag<uint8>& CompoundTag::getUint8Array(std::string key) {
+		return *((ArrayTag<uint8>*) tags.at(key));
+	}
+	ArrayTag<uint16>& CompoundTag::getUint16Array(std::string key) {
+		return *((ArrayTag<uint16>*) tags.at(key));
+	}
+	ArrayTag<uint32>& CompoundTag::getUint32Array(std::string key) {
+		return *((ArrayTag<uint32>*) tags.at(key));
+	}
+	ArrayTag<uint64>& CompoundTag::getUint64Array(std::string key) {
+		return *((ArrayTag<uint64>*) tags.at(key));
+	}
+	ArrayTag<float>& CompoundTag::getFloatArray(std::string key) {
+		return *((ArrayTag<float>*) tags.at(key));
+	}
+	ArrayTag<double>& CompoundTag::getDoubleArray(std::string key) {
+		return *((ArrayTag<double>*) tags.at(key));
+	}
+
+	void CompoundTag::keys(std::function<void(std::string)> f) {
+		for(auto it = tags.begin(); it != tags.end(); ++it) {
+			f(it->first);
+		}
+	}
+	void CompoundTag::keysDeep(std::function<void(std::string)> f) {
+		keysDeep("", f);
+	}
+	void CompoundTag::keysDeep(std::string key, std::function<void(std::string)> f) {
+		std::stack<std::string> keys;
+		for(auto it = tags.begin(); it != tags.end(); ++it) {
+			keys.push(it->first);
+
+			switch(it->second->getID()) {
+				case BD_TAG_ID_ARRAY: case BD_TAG_ID_ARRAY_FLOAT: {
+					switch(dynamic_cast<TagSizeable*>(it->second)->getSize()) {
+						case 1: {
+							for(uint16 i = 0; i < ((ArrayTag<uint8>*) it->second)->length(); ++i) {
+								std::stringstream ss;
+								keyFromStack(keys, ss);
+								ss << "." << i;
+								f(ss.str());
+							}
+							break;
+						}
+						case 2: {
+							for(uint16 i = 0; i < ((ArrayTag<uint16>*) it->second)->length(); ++i) {
+								std::stringstream ss;
+								keyFromStack(keys, ss);
+								ss << "." << i;
+								f(ss.str());
+							}
+							break;
+						}
+						case 4: {
+							for(uint16 i = 0; i < ((ArrayTag<uint32>*) it->second)->length(); ++i) {
+								std::stringstream ss;
+								keyFromStack(keys, ss);
+								ss << "." << i;
+								f(ss.str());
+							}
+							break;
+						}
+						case 8: {
+							for(uint16 i = 0; i < ((ArrayTag<uint64>*) it->second)->length(); ++i) {
+								std::stringstream ss;
+								keyFromStack(keys, ss);
+								ss << "." << i;
+								f(ss.str());
+							}
+							break;
+						}
+					}
+
+					break;
+				}
+				case BD_TAG_ID_COMPOUND: {
+					((CompoundTag*) it->second)->keysDeep(key, f);
+					break;
+				}
+				default: {
+					std::stringstream ss;
+					keyFromStack(keys, ss);
+					f(ss.str());
+				}
+			}
+
+			keys.pop();
+		}
+	}
+	void CompoundTag::keyFromStack(std::stack<std::string>& stack, std::stringstream& ss) {
+		if(stack.empty()) return;
+		std::string s = stack.top();
+		stack.pop();
+		keyFromStack(stack, ss);
+		if(stack.size() < 2) ss << s;
+		else ss << "." << s;
+		stack.push(s);
+	}
+
 	void CompoundTag::serialize(std::ostream& stream) const {
 		std::cout << "Writing new compound Tag!" << std::endl;
 

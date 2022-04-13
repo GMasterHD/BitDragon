@@ -2,6 +2,7 @@
 #include "Tag.hpp"
 #include <unordered_map>
 #include "ArrayTag.hpp"
+#include <stack>
 
 namespace bd {
 	class CompoundTag: public Tag {
@@ -41,9 +42,19 @@ namespace bd {
 		std::string getString(std::string key) const;
 		CompoundTag& getCompound(std::string key) const;
 
+		ArrayTag<uint8>& getUint8Array(std::string key);
+		ArrayTag<uint16>& getUint16Array(std::string key);
+		ArrayTag<uint32>& getUint32Array(std::string key);
+		ArrayTag<uint64>& getUint64Array(std::string key);
+		ArrayTag<float>& getFloatArray(std::string key);
+		ArrayTag<double>& getDoubleArray(std::string key);
+
 		Tag* operator[](std::string key) {
 			return get(key);
 		}
+
+		void keys(std::function<void(std::string)> f);
+		void keysDeep(std::function<void(std::string)> f);
 
 		std::vector<std::string> keys() const {
 			std::vector<std::string> out;
@@ -71,7 +82,10 @@ namespace bd {
 	private:
 		std::string readKeyName(std::istream& stream);
 		std::unordered_map<std::string, Tag*> tags;
-		
+
+		void keysDeep(std::string key, std::function<void(std::string)> f);
+		static void keyFromStack(std::stack<std::string>& stack, std::stringstream& ss);
+
 		template<typename T>
 		void readArray(std::istream& stream, uint16 size, bool floating, std::string key, uint16 length) {
 			switch(size) {

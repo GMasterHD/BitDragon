@@ -4,6 +4,7 @@
 #include "TagSizeable.hpp"
 #include <vector>
 #include <sstream>
+#include <functional>
 
 namespace bd {
 	template<typename T>
@@ -15,7 +16,7 @@ namespace bd {
 		void add(T val) {
 			values.push_back(val);
 		}
-		T& get(uint16 index) {
+		const T& get(uint16 index) {
 			return values.at(index);
 		}
 
@@ -23,8 +24,19 @@ namespace bd {
 			return values.size();
 		}
 
-		T& operator[](uint16 index) const {
-			return get(index);
+		const T& operator[](uint16 index) const {
+			return values.at(index);
+		}
+
+		void foreach(std::function<void(T)> f) const {
+			for(uint16 i = 0; i < values.size(); ++i) {
+				f(values.at(i));
+			}
+		}
+		void foreach(std::function<void(T, uint16)> f) const {
+			for(uint16 i = 0; i < values.size(); ++i) {
+				f(values.at(i), i);
+			}
 		}
 
 		void serialize(std::ostream& stream) const override {

@@ -28,5 +28,17 @@ int main(int argc, char** argv) {
 	bd::BitDragon::deserialize(deserialized, "./test.dat");
 
 	std::ofstream fstream("./test.bit", std::ios::out);
-	deserialized.stringify(fstream);
+	deserialized.stringify(fstream, true);
+
+	std::cout << "Array:";
+	deserialized.getUint32Array("arr").foreach([](uint32 value) {
+		std::cout << " " << value;
+	});
+	std::cout << std::endl;
+
+	deserialized.keysDeep([](std::string key) {
+		std::cout << key << std::endl;
+	});
+
+	std::cout << "0: " << deserialized.getUint32Array("arr")[0] << std::endl;
 }
