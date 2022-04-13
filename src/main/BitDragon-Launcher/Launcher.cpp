@@ -22,12 +22,12 @@ int main(int argc, char** argv) {
 	arr->add(3);
 	arr->add(95);
 
-	bd::BitDragon::serialize(tag, "./test.dat");
+	bd::BitDragon::serialize(tag, "./test.bd");
 
 	bd::CompoundTag deserialized;
-	bd::BitDragon::deserialize(deserialized, "./test.dat");
+	bd::BitDragon::deserialize(deserialized, "./test.bd");
 
-	std::ofstream fstream("./test.bit", std::ios::out);
+	std::ofstream fstream("./test.txt", std::ios::out);
 	deserialized.stringify(fstream, true);
 
 	std::cout << "Array:";
@@ -39,6 +39,18 @@ int main(int argc, char** argv) {
 	deserialized.keysDeep([](std::string key) {
 		std::cout << key << std::endl;
 	});
+
+	if(deserialized.isDefined("int")) {
+		std::cout << "Key int exists!" << std::endl;
+	}
+	if(deserialized.isNumber("int")) {
+		std::cout << "Key int is a number!" << std::endl;
+	}
+	if(deserialized.isUint32("int")) {
+		std::cout << "Key int is a int32!" << std::endl;
+	} else {
+		std::cout << "Key int is not a int32!" << std::endl;
+	}
 
 	std::cout << "0: " << deserialized.getUint32Array("arr")[0] << std::endl;
 }

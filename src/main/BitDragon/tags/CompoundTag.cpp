@@ -14,55 +14,70 @@ namespace bd {
 
 	void CompoundTag::setUint8(std::string key, uint8 value) {
 		tags[key] = new NumberTag(key, value, false, (uint16) 1);
+		tagTypes[key] = BD_TAG_TYPE_UINT8;
 	}
 	void CompoundTag::setUint16(std::string key, uint16 value) {
 		tags[key] = new NumberTag(key, value, false, (uint16) 2);
+		tagTypes[key] = BD_TAG_TYPE_UINT16;
 	}
 	void CompoundTag::setUint32(std::string key, uint32 value) {
 		tags[key] = new NumberTag(key, value, false, (uint16) 4);
+		tagTypes[key] = BD_TAG_TYPE_UINT32;
 	}
 	void CompoundTag::setUint64(std::string key, uint64 value) {
 		tags[key] = new NumberTag(key, value, false, (uint16) 8);
+		tagTypes[key] = BD_TAG_TYPE_UINT64;
 	}
 	void CompoundTag::setFloat(std::string key, float value) {
 		tags[key] = new NumberTag(key, value, true, (uint16) 4);
+		tagTypes[key] = BD_TAG_TYPE_FLOAT;
 	}
 	void CompoundTag::setDouble(std::string key, double value) {
 		tags[key] = new NumberTag(key, value, true, (uint16) 8);
+		tagTypes[key] = BD_TAG_TYPE_DOUBLE;
 	}
 	void CompoundTag::setBool(std::string key, bool value) {
 		tags[key] = new NumberTag(key, value ? 1 : 0, false, (uint16) 1);
+		tagTypes[key] = BD_TAG_TYPE_BOOL;
 	}
 	void CompoundTag::setString(std::string key, std::string value) {
 		tags[key] = new StringTag(key, value);
+		tagTypes[key] = BD_TAG_TYPE_STRING;
 	}
 	CompoundTag* CompoundTag::createCompound(std::string key) {
 		tags.insert(std::pair<std::string, Tag*>(key, (Tag*) new CompoundTag()));
+		tagTypes[key] = BD_TAG_TYPE_COMPOUND;
 		return (CompoundTag*) tags.at(key);
 	}
 
 	ArrayTag<uint8>* CompoundTag::createUint8Array(std::string key) {
 		tags.insert(std::pair<std::string, Tag*>(key, (Tag*) new ArrayTag<uint8>(key, 1, false)));
+		tagTypes[key] = BD_TAG_TYPE_ARRAY_UINT8;
 		return (ArrayTag<uint8>*) tags.at(key);
 	}
 	ArrayTag<uint16>* CompoundTag::createUint16Array(std::string key) {
 		tags.insert(std::pair<std::string, Tag*>(key, (Tag*) new ArrayTag<uint16>(key, 2, false)));
+		tagTypes[key] = BD_TAG_TYPE_ARRAY_UINT16;
 		return (ArrayTag<uint16>*) tags.at(key);
 	}
 	ArrayTag<uint32>* CompoundTag::createUint32Array(std::string key) {
 		tags.insert(std::pair<std::string, Tag*>(key, (Tag*) new ArrayTag<uint32>(key, 4, false)));
+		tagTypes[key] = BD_TAG_TYPE_ARRAY_UINT32;
 		return (ArrayTag<uint32>*) tags.at(key);
 	}
 	ArrayTag<uint64>* CompoundTag::createUint64Array(std::string key) {
 		tags.insert(std::pair<std::string, Tag*>(key, (Tag*) new ArrayTag<uint64>(key, 8, false)));
+		tagTypes[key] = BD_TAG_TYPE_ARRAY_UINT64;
 		return (ArrayTag<uint64>*) tags.at(key);
 	}
 	ArrayTag<float>* CompoundTag::createFloatArray(std::string key) {
 		tags.insert(std::pair<std::string, Tag*>(key, (Tag*) new ArrayTag<float>(key, 4, true)));
+		tagTypes[key] = BD_TAG_TYPE_ARRAY_FLOAT;
 		return (ArrayTag<float>*) tags.at(key);
 	}
 	ArrayTag<double>* CompoundTag::createDoubleArray(std::string key) {
 		tags.insert(std::pair<std::string, Tag*>(key, (Tag*) new ArrayTag<double>(key, 8, true)));
+		tagTypes[key] = BD_TAG_TYPE_ARRAY_DOUBLE;
 		return (ArrayTag<double>*) tags.at(key);
 	}
 
@@ -118,6 +133,82 @@ namespace bd {
 	}
 	ArrayTag<double>& CompoundTag::getDoubleArray(std::string key) {
 		return *((ArrayTag<double>*) tags.at(key));
+	}
+
+	bool CompoundTag::isDefined(std::string key) {
+		return tagTypes.find(key) != tagTypes.end();
+	}
+	bool CompoundTag::isNumber(std::string key) {
+		if(!isDefined(key)) return false;
+		switch(tagTypes.at(key)) {
+			case BD_TAG_TYPE_UINT8: case BD_TAG_TYPE_UINT16: case BD_TAG_TYPE_UINT32: case BD_TAG_TYPE_UINT64: case BD_TAG_TYPE_FLOAT: case BD_TAG_TYPE_DOUBLE:
+				return true;
+		}
+		return false;
+	}
+	bool CompoundTag::isUint8(std::string key) {
+		if(!isDefined(key)) return false;
+		return tagTypes.at(key) == BD_TAG_TYPE_UINT8;
+	}
+	bool CompoundTag::isUint16(std::string key) {
+		if(!isDefined(key)) return false;
+		return tagTypes.at(key) == BD_TAG_TYPE_UINT16;
+	}
+	bool CompoundTag::isUint32(std::string key) {
+		if(!isDefined(key)) return false;
+		return tagTypes.at(key) == BD_TAG_TYPE_UINT32;
+	}
+	bool CompoundTag::isUint64(std::string key) {
+		if(!isDefined(key)) return false;
+		return tagTypes.at(key) == BD_TAG_TYPE_UINT64;
+	}
+	bool CompoundTag::isFloat(std::string key) {
+		if(!isDefined(key)) return false;
+		return tagTypes.at(key) == BD_TAG_TYPE_FLOAT;
+	}
+	bool CompoundTag::isDouble(std::string key) {
+		if(!isDefined(key)) return false;
+		return tagTypes.at(key) == BD_TAG_TYPE_DOUBLE;
+	}
+	bool CompoundTag::isArray(std::string key) {
+		if(!isDefined(key)) return false;
+		switch(tagTypes.at(key)) {
+			case BD_TAG_TYPE_ARRAY_UINT8: case BD_TAG_TYPE_ARRAY_UINT16: case BD_TAG_TYPE_ARRAY_UINT32: case BD_TAG_TYPE_ARRAY_UINT64: case BD_TAG_TYPE_ARRAY_FLOAT: case BD_TAG_TYPE_ARRAY_DOUBLE:
+				return true;
+		}
+		return false;
+	}
+	bool CompoundTag::isUint8Array(std::string key) {
+		if(!isDefined(key)) return false;
+		return tagTypes.at(key) == BD_TAG_TYPE_ARRAY_UINT8;
+	}
+	bool CompoundTag::isUint16Array(std::string key) {
+		if(!isDefined(key)) return false;
+		return tagTypes.at(key) == BD_TAG_TYPE_ARRAY_UINT16;
+	}
+	bool CompoundTag::isUint32Array(std::string key) {
+		if(!isDefined(key)) return false;
+		return tagTypes.at(key) == BD_TAG_TYPE_ARRAY_UINT32;
+	}
+	bool CompoundTag::isUint64Array(std::string key) {
+		if(!isDefined(key)) return false;
+		return tagTypes.at(key) == BD_TAG_TYPE_ARRAY_UINT64;
+	}
+	bool CompoundTag::isFloatArray(std::string key) {
+		if(!isDefined(key)) return false;
+		return tagTypes.at(key) == BD_TAG_TYPE_ARRAY_FLOAT;
+	}
+	bool CompoundTag::isDoubleArray(std::string key) {
+		if(!isDefined(key)) return false;
+		return tagTypes.at(key) == BD_TAG_TYPE_ARRAY_DOUBLE;
+	}
+	bool CompoundTag::isString(std::string key) {
+		if(!isDefined(key)) return false;
+		return tagTypes.at(key) == BD_TAG_TYPE_STRING;
+	}
+	bool CompoundTag::isCompound(std::string key) {
+		if(!isDefined(key)) return false;
+		return tagTypes.at(key) == BD_TAG_TYPE_COMPOUND;
 	}
 
 	void CompoundTag::keys(std::function<void(std::string)> f) {

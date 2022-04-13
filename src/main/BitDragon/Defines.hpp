@@ -21,6 +21,22 @@ typedef double float64;
 #define BD_TAG_ID_ARRAY_FLOAT	0x06	// An array with floatings
 #define BD_TAG_ID_COMPOUND		0x07	// A Compound
 
+#define BD_TAG_TYPE_UINT8			0x00
+#define BD_TAG_TYPE_UINT16			0x01
+#define BD_TAG_TYPE_UINT32			0x02
+#define BD_TAG_TYPE_UINT64			0x03
+#define BD_TAG_TYPE_FLOAT			0x04
+#define BD_TAG_TYPE_DOUBLE			0x05
+#define BD_TAG_TYPE_BOOL			0x06
+#define BD_TAG_TYPE_STRING			0x07
+#define BD_TAG_TYPE_COMPOUND		0x08
+#define BD_TAG_TYPE_ARRAY_UINT8		0x09
+#define BD_TAG_TYPE_ARRAY_UINT16	0x0A
+#define BD_TAG_TYPE_ARRAY_UINT32	0x0B
+#define BD_TAG_TYPE_ARRAY_UINT64	0x0C
+#define BD_TAG_TYPE_ARRAY_FLOAT		0x0D
+#define BD_TAG_TYPE_ARRAY_DOUBLE	0x0E
+
 #define BD_TAG_DATA_TYPE_INT8	'b'
 #define BD_TAG_DATA_TYPE_INT16	's'
 #define BD_TAG_DATA_TYPE_INT32	'i'

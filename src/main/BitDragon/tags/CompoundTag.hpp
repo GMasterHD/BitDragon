@@ -49,6 +49,24 @@ namespace bd {
 		ArrayTag<float>& getFloatArray(std::string key);
 		ArrayTag<double>& getDoubleArray(std::string key);
 
+		bool isDefined(std::string key);
+		bool isNumber(std::string key);
+		bool isUint8(std::string key);
+		bool isUint16(std::string key);
+		bool isUint32(std::string key);
+		bool isUint64(std::string key);
+		bool isFloat(std::string key);
+		bool isDouble(std::string key);
+		bool isArray(std::string key);
+		bool isUint8Array(std::string key);
+		bool isUint16Array(std::string key);
+		bool isUint32Array(std::string key);
+		bool isUint64Array(std::string key);
+		bool isFloatArray(std::string key);
+		bool isDoubleArray(std::string key);
+		bool isString(std::string key);
+		bool isCompound(std::string key);
+
 		Tag* operator[](std::string key) {
 			return get(key);
 		}
@@ -81,7 +99,9 @@ namespace bd {
 
 	private:
 		std::string readKeyName(std::istream& stream);
+		
 		std::unordered_map<std::string, Tag*> tags;
+		std::unordered_map<std::string, uint8> tagTypes;
 
 		void keysDeep(std::string key, std::function<void(std::string)> f);
 		static void keyFromStack(std::stack<std::string>& stack, std::stringstream& ss);
