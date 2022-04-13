@@ -292,7 +292,9 @@ namespace bd {
 	}
 
 	void CompoundTag::serialize(std::ostream& stream) const {
+		#ifdef _DEBUG
 		std::cout << "Writing new compound Tag!" << std::endl;
+		#endif
 
 		uint8 startID = BD_TAG_ID_CTAG_START;
 		uint8 endID = BD_TAG_ID_CTAG_END;
@@ -515,7 +517,9 @@ namespace bd {
 
 			if(id == BD_TAG_ID_COMPOUND) {
 				std::string key = readKeyName(stream);
+				#ifdef _DEBUG
 				std::cout << "Starting new compound with key '" << key << "'" << std::endl;
+				#endif
 				CompoundTag* inner = createCompound(key);
 				inner->deserialize(stream);
 			} else if(id == BD_TAG_ID_CTAG_END) {
@@ -525,8 +529,10 @@ namespace bd {
 				std::string key = readKeyName(stream);
 				uint16 size;
 				stream.read((char*) &size, sizeof(uint16));
+				#ifdef _DEBUG
 				std::cout << "Reading key '" << key << "' (Size: " << size << " Floating: " << floating << ")" << std::endl;
-
+				#endif
+				
 				switch(size) {
 					case 1: {
 						uint8 num;
@@ -574,8 +580,10 @@ namespace bd {
 				uint16 length;
 				stream.read((char*) &length, sizeof(uint16));
 
+				#ifdef _DEBUG
 				std::cout << "Reading array '" << key << "' (Size: " << size << ", Length: " << length << ", Floatings: " << floating << ")" << std::endl;
-				
+				#endif
+
 				switch(size) {
 					case 1: {
 						readArray<uint8>(stream, size, floating, key, length); 

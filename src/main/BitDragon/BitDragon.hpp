@@ -1,6 +1,10 @@
 #pragma once
-#include "tags/Tag.hpp"
+#include "tags/ArrayTag.hpp"
 #include "tags/CompoundTag.hpp"
+#include "tags/NumberTag.hpp"
+#include "tags/StringTag.hpp"
+#include "tags/Tag.hpp"
+#include "tags/TagSizeable.hpp"
 
 namespace bd {
 	class BitDragon {

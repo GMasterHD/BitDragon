@@ -1,5 +1,6 @@
 #include <iostream>
 #include <fstream>
+
 #include "BitDragon/Defines.hpp"
 #include "BitDragon/BitDragon.hpp"
 
