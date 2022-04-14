@@ -114,7 +114,6 @@ namespace bd {
 		void stringify(std::ostream& stream, bool tabs = false) const {
 			stringify(stream, tabs, "");
 		}
-
 	private:
 		std::string readKeyName(std::istream& stream);
 		

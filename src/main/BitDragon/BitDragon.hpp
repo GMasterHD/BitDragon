@@ -21,7 +21,6 @@ namespace bd {
 		/// <param name="tag">The compound to save to</param>
 		/// <param name="stream">The istream</param>
 		static void deserialize(CompoundTag& tag, std::istream& stream);
-
 	private:
 	};
 }

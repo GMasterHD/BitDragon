@@ -43,3 +43,6 @@ typedef double float64;
 #define BD_TAG_DATA_TYPE_INT64	'l'
 #define BD_TAG_DATA_TYPE_FLOAT	'f'
 #define BD_TAG_DATA_TYPE_DOUBLE	'd'
+
+#define BD_MIN(a, b) a < b ? a : b
+#define BD_MAX(a, b) a > b ? a : b
