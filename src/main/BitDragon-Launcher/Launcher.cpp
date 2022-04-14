@@ -23,13 +23,18 @@ int main(int argc, char** argv) {
 	arr->add(3);
 	arr->add(95);
 
-	bd::BitDragon::serialize(tag, "./test.bd");
+	std::ofstream fstream("./test.txt", std::ios::out);
+	tag.stringify(fstream, true);
+	fstream.close();
+
+	std::ofstream ofs("./test.bd", std::ios::binary | std::ios::out);
+	bd::BitDragon::serialize(tag, ofs);
+	ofs.close();
 
 	bd::CompoundTag deserialized;
-	bd::BitDragon::deserialize(deserialized, "./test.bd");
-
-	std::ofstream fstream("./test.txt", std::ios::out);
-	deserialized.stringify(fstream, true);
+	std::ifstream ifs("./test.bd", std::ios::binary | std::ios::in);
+	bd::BitDragon::deserialize(deserialized, ifs);
+	ifs.close();
 
 	std::cout << "Array:";
 	deserialized.getUint32Array("arr").foreach([](uint32 value) {
