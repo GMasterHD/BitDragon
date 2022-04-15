@@ -340,7 +340,7 @@ namespace bd {
 								double num64 = std::any_cast<double>(number);
 								stream.write(reinterpret_cast<const char*>(&num64), sizeof(double));
 							} else {
-								uint64 num64 = std::any_cast<double>(number);
+								uint64 num64 = std::any_cast<uint64>(number);
 								stream.write(reinterpret_cast<const char*>(&num64), sizeof(uint64));
 							}
 							break;
